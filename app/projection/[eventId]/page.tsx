@@ -52,33 +52,57 @@ function FilmStrip({
   direction?: 'up' | 'down';
   speed?: number;
 }) {
-  const cardH = 300; // Fixed card height for consistency
+  const cardH = 300;
   const GAP = 12;
-  const SW = 18; // Sprocket width
-  const SH = 12; // Sprocket hole height
-  const SGAP = 24; // Gap between holes
+  const SW = 18; 
+  const SH = 12; 
+  const SGAP = 24; 
 
-  // Ensure enough items to fill a long strip
+  // We ensure exactly 30 items per block so the height is always exactly 9360px
   const items = useMemo(() => {
     if (photos.length === 0) return [];
-    // We want the strip to be very long, e.g. 30 photos
     const reps = Math.ceil(30 / photos.length);
     return Array.from({ length: reps }, () => photos).flat().slice(0, 30);
   }, [photos]);
 
-  // Duplicate items for seamless loop
-  const loopItems = [...items, ...items];
+  const blockHeight = 9360; // 30 * (300 + 12)
+  const sprocketCount = 260; // 9360 / (12 + 24)
 
-  // Calculate how many sprockets we need to cover the entire duplicated height
-  const totalHeight = loopItems.length * (cardH + GAP) + 100;
-  const sprocketCount = Math.floor(totalHeight / (SH + SGAP));
+  const StripBlock = () => (
+    <div className="relative w-full flex-shrink-0" style={{ height: blockHeight }}>
+      {/* Left sprockets */}
+      <div className="absolute left-0 top-0 bottom-0 flex flex-col" style={{ width: SW, gap: SGAP }}>
+        {Array.from({ length: sprocketCount }).map((_, i) => (
+          <div key={i} style={{ width: SW - 6, height: SH, marginLeft: 3, flexShrink: 0, background: '#050505', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 3 }} />
+        ))}
+      </div>
+      {/* Right sprockets */}
+      <div className="absolute right-0 top-0 bottom-0 flex flex-col" style={{ width: SW, gap: SGAP }}>
+        {Array.from({ length: sprocketCount }).map((_, i) => (
+          <div key={i} style={{ width: SW - 6, height: SH, marginLeft: 3, flexShrink: 0, background: '#050505', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 3 }} />
+        ))}
+      </div>
+      {/* Photos */}
+      {items.length > 0 && (
+        <div className="absolute top-0 flex flex-col" style={{ left: SW, right: SW, gap: GAP }}>
+          {items.map((photo, i) => (
+            <div key={`${photo.id}-${i}`} className="flex-shrink-0 overflow-hidden relative" style={{ height: cardH, background: '#111', borderRadius: 4 }}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={photo.dataUrl} alt="" className="w-full h-full object-cover" draggable={false} style={{ filter: 'saturate(0.7) brightness(0.85) contrast(1.1)' }} />
+              <div className="absolute inset-0 pointer-events-none" style={{ boxShadow: 'inset 0 0 40px rgba(0,0,0,0.6)' }} />
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
 
   return (
     <div
       className="relative flex-shrink-0 overflow-hidden"
       style={{
         width: 280,
-        height: '180vh', // tall enough to cover the diagonal screen space
+        height: '180vh', 
         opacity,
         filter: blur > 0 ? `blur(${blur}px)` : undefined,
         transform: `scale(${scale})`,
@@ -90,44 +114,12 @@ function FilmStrip({
     >
       <motion.div
         className="absolute left-0 right-0 flex flex-col"
+        style={{ gap: 0 }}
         animate={{ y: direction === 'up' ? ['0%', '-50%'] : ['-50%', '0%'] }}
         transition={{ duration: speed, ease: 'linear', repeat: Infinity }}
       >
-        {/* Left sprockets */}
-        <div className="absolute left-0 top-0 bottom-0 flex flex-col pt-4"
-          style={{ width: SW, gap: SGAP }}>
-          {Array.from({ length: sprocketCount }).map((_, i) => (
-            <div key={i} style={{ width: SW - 6, height: SH, marginLeft: 3, flexShrink: 0, background: '#050505', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 3 }} />
-          ))}
-        </div>
-        {/* Right sprockets */}
-        <div className="absolute right-0 top-0 bottom-0 flex flex-col pt-4"
-          style={{ width: SW, gap: SGAP }}>
-          {Array.from({ length: sprocketCount }).map((_, i) => (
-            <div key={i} style={{ width: SW - 6, height: SH, marginLeft: 3, flexShrink: 0, background: '#050505', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 3 }} />
-          ))}
-        </div>
-
-        {/* Photos */}
-        <div className="flex flex-col py-8"
-          style={{ marginLeft: SW, marginRight: SW, gap: GAP }}>
-          {loopItems.map((photo, i) => (
-            <div key={`${photo.id}-${i}`} className="flex-shrink-0 overflow-hidden relative"
-              style={{ height: cardH, background: '#111', borderRadius: 4 }}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={photo.dataUrl}
-                alt=""
-                className="w-full h-full object-cover"
-                draggable={false}
-                style={{ filter: 'saturate(0.7) brightness(0.85) contrast(1.1)' }}
-              />
-              {/* Soft shadow / vignette per photo */}
-              <div className="absolute inset-0 pointer-events-none"
-                style={{ boxShadow: 'inset 0 0 40px rgba(0,0,0,0.5)' }} />
-            </div>
-          ))}
-        </div>
+        <StripBlock />
+        <StripBlock />
       </motion.div>
     </div>
   );
@@ -176,11 +168,26 @@ export default function ProjectionPage() {
 
   const stripPhotoSets = useMemo(() => {
     const reversedPhotos = [...photos].reverse();
-    // Return all photos for each strip, but offset them so strips look different
+    if (reversedPhotos.length === 0) return [[], [], [], []];
+
+    // Snake Priority Offset:
+    // We want all strips to contain ALL photos so they stack vertically.
+    // BUT we offset them so the NEWEST photo appears in the Main strip first.
+    // Strip 2 (Main hero) -> Offset 0 (Newest photo)
+    // Strip 1 (Secondary left) -> Offset 1 (2nd newest)
+    // Strip 3 (Background right) -> Offset 2 (3rd newest)
+    // Strip 0 (Background left) -> Offset 3 (4th newest)
+    const stripOffsets: Record<number, number> = {
+      2: 0,
+      1: 1,
+      3: 2,
+      0: 3,
+    };
+    
     return Array.from({ length: NUM_STRIPS }).map((_, i) => {
-      if (reversedPhotos.length === 0) return [];
-      const offset = i % reversedPhotos.length;
-      return [...reversedPhotos.slice(offset), ...reversedPhotos.slice(0, offset)];
+      const idealOffset = stripOffsets[i];
+      const actualOffset = idealOffset % reversedPhotos.length;
+      return [...reversedPhotos.slice(actualOffset), ...reversedPhotos.slice(0, actualOffset)];
     });
   }, [photos]);
 

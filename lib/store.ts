@@ -11,48 +11,7 @@ export type Photo = {
   createdAt: number;
 };
 
-const DUMMY_PHOTOS: Photo[] = [
-  {
-    id: 'dummy-1',
-    eventId: 'demo-wedding',
-    dataUrl: 'https://picsum.photos/seed/wedding1/800/600',
-    guestName: 'Lisa & Bani',
-    theme: 'polaroid',
-    createdAt: Date.now() - 100000,
-  },
-  {
-    id: 'dummy-2',
-    eventId: 'demo-wedding',
-    dataUrl: 'https://picsum.photos/seed/wedding2/800/600',
-    guestName: 'Charlie',
-    theme: 'minimal',
-    createdAt: Date.now() - 80000,
-  },
-  {
-    id: 'dummy-3',
-    eventId: 'demo-wedding',
-    dataUrl: 'https://picsum.photos/seed/wedding3/800/600',
-    guestName: 'Dave',
-    theme: 'rustic',
-    createdAt: Date.now() - 60000,
-  },
-  {
-    id: 'dummy-4',
-    eventId: 'demo-wedding',
-    dataUrl: 'https://picsum.photos/seed/wedding4/800/600',
-    guestName: 'Eve',
-    theme: 'dark',
-    createdAt: Date.now() - 40000,
-  },
-  {
-    id: 'dummy-5',
-    eventId: 'demo-wedding',
-    dataUrl: 'https://picsum.photos/seed/wedding5/800/600',
-    guestName: 'Frank & Grace',
-    theme: 'polaroid',
-    createdAt: Date.now() - 20000,
-  },
-];
+
 
 /**
  * Scan public/upload/ and return Photo entries for any files not already in store.
@@ -91,15 +50,11 @@ declare global {
 }
 
 export const getStore = (): Photo[] => {
-  if (!global._memoirePhotos) {
-    // Seed with dummy + any already-uploaded files on disk
+  // If global memory still has dummy photos from before the reload, we clear it out!
+  if (!global._memoirePhotos || global._memoirePhotos.some(p => p.id.startsWith('dummy'))) {
+    // Seed with any already-uploaded files on disk
     const uploaded = loadUploadedPhotos();
-    const uploadedIds = new Set(uploaded.map(p => p.id));
-
-    // Keep dummy photos that don't clash with real uploaded IDs
-    const dummies = DUMMY_PHOTOS.filter(p => !uploadedIds.has(p.id));
-
-    global._memoirePhotos = [...dummies, ...uploaded];
+    global._memoirePhotos = [...uploaded];
   }
   return global._memoirePhotos;
 };
