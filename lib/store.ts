@@ -16,7 +16,7 @@ const DUMMY_PHOTOS: Photo[] = [
     id: 'dummy-1',
     eventId: 'demo-wedding',
     dataUrl: 'https://picsum.photos/seed/wedding1/800/600',
-    guestName: 'Alice & Bob',
+    guestName: 'Lisa & Bani',
     theme: 'polaroid',
     createdAt: Date.now() - 100000,
   },
