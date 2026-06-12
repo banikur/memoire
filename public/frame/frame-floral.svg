@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600">
+  <defs>
+    <mask id="hole5">
+      <rect width="800" height="600" fill="white"/>
+      <rect x="48" y="48" width="704" height="504" fill="black"/>
+    </mask>
+    <linearGradient id="goldGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f5e6a3"/>
+      <stop offset="40%" stop-color="#d4a853"/>
+      <stop offset="100%" stop-color="#b8860b"/>
+    </linearGradient>
+  </defs>
+  <!-- Gold base -->
+  <rect width="800" height="600" fill="url(#goldGrad)" mask="url(#hole5)"/>
+  <!-- Inner filigree line -->
+  <rect x="46" y="46" width="708" height="508"
+    fill="none" stroke="#fff8e0" stroke-width="1.5" opacity="0.6"/>
+  <!-- Outer border -->
+  <rect x="2" y="2" width="796" height="596"
+    fill="none" stroke="#c9940a" stroke-width="3"/>
+  <!-- Corner floral diamond -->
+  <polygon points="20,6 30,20 20,34 10,20"
+      fill="#fff8e0" opacity="0.7"/>
+    <circle cx="20" cy="20" r="3.5" fill="#b8860b"/>
+  <polygon points="780,6 790,20 780,34 770,20"
+      fill="#fff8e0" opacity="0.7"/>
+    <circle cx="780" cy="20" r="3.5" fill="#b8860b"/>
+  <polygon points="20,566 30,580 20,594 10,580"
+      fill="#fff8e0" opacity="0.7"/>
+    <circle cx="20" cy="580" r="3.5" fill="#b8860b"/>
+  <polygon points="780,566 790,580 780,594 770,580"
+      fill="#fff8e0" opacity="0.7"/>
+    <circle cx="780" cy="580" r="3.5" fill="#b8860b"/>
+  <!-- Top center ornament -->
+  <polygon points="400,6 408,18 392,18" fill="#fff8e0" opacity="0.6"/>
+  <!-- Bottom center ornament -->
+  <polygon points="400,594 408,582 392,582" fill="#fff8e0" opacity="0.6"/>
+  <!-- Label -->
+  <text x="400" y="588" text-anchor="middle"
+    font-family="Georgia, serif" font-style="italic" font-size="12" fill="#fff8e0" letter-spacing="3" opacity="0.85">Memoire</text>
+</svg>

@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600">
+  <defs>
+    <mask id="hole2">
+      <rect width="800" height="600" fill="white"/>
+      <rect x="48" y="48" width="704" height="464" fill="black"/>
+    </mask>
+    <filter id="shadow">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#00000022"/>
+    </filter>
+  </defs>
+  <!-- Cream background -->
+  <rect width="800" height="600" fill="#fdfaf5" mask="url(#hole2)" filter="url(#shadow)"/>
+  <!-- Bottom white strip (polaroid caption area) -->
+  <rect x="48" y="512" width="704" height="40 + 48" fill="#fdfaf5"/>
+  <!-- Outer border -->
+  <rect x="1" y="1" width="798" height="598" fill="none" stroke="#e8e0d0" stroke-width="2"/>
+  <!-- Tape strip top center -->
+  <rect x="360" y="0" width="80" height="18" rx="2" fill="rgba(255,220,180,0.55)" stroke="#e0c090" stroke-width="1"/>
+  <!-- Caption line -->
+  <line x1="320" y1="572" x2="480" y2="572" stroke="#d0c8b0" stroke-width="1" stroke-dasharray="4 4"/>
+  <!-- Label -->
+  <text x="400" y="588" text-anchor="middle"
+    font-family="Georgia, serif" font-style="italic" font-size="13" fill="#c0b090" letter-spacing="2">Memoire</text>
+</svg>

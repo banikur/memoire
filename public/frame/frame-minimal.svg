@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600">
+  <defs>
+    <mask id="hole">
+      <rect width="800" height="600" fill="white"/>
+      <rect x="48" y="48" width="704" height="504" fill="black"/>
+    </mask>
+  </defs>
+  <!-- Frame body -->
+  <rect width="800" height="600" fill="white" mask="url(#hole)"/>
+  <!-- Inner shadow line -->
+  <rect x="48" y="48" width="704" height="504"
+    fill="none" stroke="#e5e5e5" stroke-width="1.5"/>
+  <!-- Outer border -->
+  <rect x="2" y="2" width="796" height="596"
+    fill="none" stroke="#d4d4d4" stroke-width="2"/>
+  <!-- Corner accents -->
+  <line x1="2" y1="2" x2="28" y2="2" stroke="#aaa" stroke-width="2"/>
+  <line x1="2" y1="2" x2="2" y2="28" stroke="#aaa" stroke-width="2"/>
+  <line x1="798" y1="2" x2="772" y2="2" stroke="#aaa" stroke-width="2"/>
+  <line x1="798" y1="2" x2="798" y2="28" stroke="#aaa" stroke-width="2"/>
+  <line x1="2" y1="598" x2="28" y2="598" stroke="#aaa" stroke-width="2"/>
+  <line x1="2" y1="598" x2="2" y2="572" stroke="#aaa" stroke-width="2"/>
+  <line x1="798" y1="598" x2="772" y2="598" stroke="#aaa" stroke-width="2"/>
+  <line x1="798" y1="598" x2="798" y2="572" stroke="#aaa" stroke-width="2"/>
+  <!-- Label -->
+  <text x="400" y="586" text-anchor="middle"
+    font-family="Georgia, serif" font-size="11" fill="#bbb" letter-spacing="3">MEMOIRE</text>
+</svg>

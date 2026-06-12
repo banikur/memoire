@@ -1,0 +1,6 @@
+{
+  "name": "Memoire",
+  "description": "Interactive Wedding Memory Wall - SaaS Platform",
+  "requestFramePermissions": ["camera"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
