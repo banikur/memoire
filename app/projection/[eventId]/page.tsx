@@ -214,12 +214,18 @@ export default function ProjectionPage() {
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [highlightPhoto, setHighlightPhoto] = useState<Photo | null>(null);
   const [origin, setOrigin] = useState('');
-  // Simulated live counter — guests online
-  const [guestsOnline] = useState(() => Math.floor(Math.random() * 18) + 4);
+  // guestsOnline diinisialisasi di useEffect (client-only) supaya tidak hydration mismatch
+  const [guestsOnline, setGuestsOnline] = useState(0);
+  // Flag: apakah ini fetch pertama? Kalau ya, jangan trigger highlight
+  const isInitialFetch = useRef(true);
 
-  useEffect(() => { setOrigin(window.location.origin); }, []);
+  useEffect(() => {
+    setOrigin(window.location.origin);
+    setGuestsOnline(Math.floor(Math.random() * 18) + 4);
+  }, []);
 
-  const qrUrl = `${origin}${EVENT_META.captureRoute}`;
+  // QR mengarah ke halaman capture untuk eventId yang sedang aktif
+  const qrUrl = `${origin}/capture/${eventId}`;
 
   useEffect(() => {
     const fetchPhotos = async () => {
@@ -231,13 +237,16 @@ export default function ProjectionPage() {
           setPhotos(prev => {
             if (data.photos.length > prev.length) {
               const newPhotos = data.photos.filter((np: Photo) => !prev.some(p => p.id === np.id));
-              if (newPhotos.length > 0)
+              // Jangan trigger highlight pada fetch pertama (initial load)
+              if (newPhotos.length > 0 && !isInitialFetch.current)
                 setTimeout(() => setHighlightPhoto(newPhotos[newPhotos.length - 1]), 0);
               return data.photos;
             }
             if (data.photos.length < prev.length) return data.photos;
             return prev;
           });
+          // Setelah fetch pertama selesai, aktifkan highlight untuk fetch berikutnya
+          isInitialFetch.current = false;
         }
       } catch (e: any) { console.error(e.message); }
     };
@@ -246,7 +255,7 @@ export default function ProjectionPage() {
     return () => clearInterval(iv);
   }, [eventId]);
 
-  const NUM_STRIPS = 5;
+  const NUM_STRIPS = 3;
 
   const stripPhotoSets = useMemo(() => {
     const MIN_PER_STRIP = 4;
@@ -261,16 +270,14 @@ export default function ProjectionPage() {
     });
   }, [photos]);
 
-  // Strip visual config: center strip is biggest/brightest, sides are dimmer
+  // 3 strip — kiri & kanan lebih redup, tengah paling terang
   const strips: {
     widthPct: number; speed: number; direction: 'up' | 'down';
     opacity: number; blur: number;
   }[] = [
-    { widthPct: 11, speed: 22, direction: 'up',   opacity: 0.45, blur: 1.5 },
-    { widthPct: 12, speed: 17, direction: 'down',  opacity: 0.65, blur: 0.5 },
-    { widthPct: 13, speed: 14, direction: 'up',    opacity: 1.0,  blur: 0   },
-    { widthPct: 12, speed: 18, direction: 'down',  opacity: 0.65, blur: 0.5 },
-    { widthPct: 11, speed: 23, direction: 'up',    opacity: 0.45, blur: 1.5 },
+    { widthPct: 14, speed: 18, direction: 'down', opacity: 0.55, blur: 1.2 },
+    { widthPct: 16, speed: 13, direction: 'up',   opacity: 1.0,  blur: 0   },
+    { widthPct: 14, speed: 20, direction: 'down', opacity: 0.55, blur: 1.2 },
   ];
 
   return (
@@ -311,7 +318,7 @@ export default function ProjectionPage() {
       ══════════════════════════════════════════ */}
       <div
         className="absolute top-0 bottom-0 flex flex-row items-start gap-[5px] z-10"
-        style={{ left: '42%', width: '75vw', overflow: 'visible' }}
+        style={{ left: 'calc(100vw - 47vw - 5px)', width: '48vw', overflow: 'visible' }}
       >
         {stripPhotoSets.some(s => s.length > 0) ? (
           strips.map((s, i) => (
@@ -341,7 +348,7 @@ export default function ProjectionPage() {
       ══════════════════════════════════════════ */}
       <div className="absolute inset-y-0 z-20 pointer-events-none"
         style={{
-          left: 'calc(42% - 100px)',
+          left: 'calc(100vw - 47vw - 105px)',
           width: 380,
           transform: `skewX(${SKEW}deg)`,
           transformOrigin: 'center',
